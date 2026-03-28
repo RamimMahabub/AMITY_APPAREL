@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Buyers - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">Buyers List</h2>
+        <a href="{{ url_for('orders.buyer_new') }}" class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5">Add Buyer</a>
+    </div>
+
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3">ID</th>
+                    <th class="px-6 py-3">Name</th>
+                    <th class="px-6 py-3">Country</th>
+                    <th class="px-6 py-3">Contact Info</th>
+                    <th class="px-6 py-3">Total Orders (System)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in buyers %}
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">{{ b.id }}</td>
+                    <td class="px-6 py-4 font-bold">{{ b.name }}</td>
+                    <td class="px-6 py-4">{{ b.country }}</td>
+                    <td class="px-6 py-4">{{ b.contact_info }}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">{{ b.orders|length }}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center">No buyers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

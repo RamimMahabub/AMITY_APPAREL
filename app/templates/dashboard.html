@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="px-4">
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Overview</h2>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Active Orders</h5>
+            <span class="text-4xl font-extrabold text-blue-600">{{ total_active_orders }}</span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Est. Monthly Revenue</h5>
+            <span class="text-4xl font-extrabold text-green-500">${{ "{:,.2f}".format(monthly_revenue) }}</span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Yarn Stock</h5>
+            <span class="text-4xl font-extrabold text-indigo-500">{{ total_yarn_stock }} <span class="text-xl text-gray-400">kg</span></span>
+        </div>
+    </div>
+
+    <!-- Urgent Orders Alert -->
+    {% if urgent_orders %}
+    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded shadow-sm" role="alert">
+        <p class="font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Urgent Orders (Deadline within 48h)
+        </p>
+        <ul class="list-disc pl-8 mt-2">
+            {% for o in urgent_orders %}
+            <li>Order #{{ o.id }} - {{ o.product_name }} (Deadline: {{ o.deadline.strftime('%Y-%m-%d') }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Production Status</h3>
+            <div class="relative h-64 w-full flex justify-center">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Monthly Shipment Volume (Est)</h3>
+            <div class="relative h-64 w-full">
+                <canvas id="shipmentChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Doughnut Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active', 'Completed', 'Shipped'],
+                datasets: [{
+                    data: [{{ order_counts['Active'] }}, {{ order_counts['Completed'] }}, {{ order_counts['Shipped'] }}],
+                    backgroundColor: ['#3b82f6', '#10b981', '#6366f1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Bar Chart (Mocked Volume)
+        const shipmentCtx = document.getElementById('shipmentChart').getContext('2d');
+        new Chart(shipmentCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Containers Shipped',
+                    data: [2, 3, 1, 4, 3, 5], // Mocked past data + current
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

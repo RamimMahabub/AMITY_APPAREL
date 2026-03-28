@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-100 mt-6">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">{{ title }}</h2>
+        {% if back_url %}
+        <a href="{{ back_url }}" class="text-sm text-blue-600 hover:underline">&larr; Back</a>
+        {% endif %}
+    </div>
+
+    <form method="POST" action="" class="space-y-4" {% if has_file %}enctype="multipart/form-data"{% endif %}>
+        {{ form.hidden_tag() }}
+        
+        {% for field in form if field.name != 'csrf_token' and field.name != 'submit' %}
+        <div>
+            {{ field.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+            {% if field.type == 'SelectField' %}
+                {{ field(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            {% elif field.type == 'FileField' %}
+                {{ field(class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100") }}
+            {% else %}
+                {{ field(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            {% endif %}
+            
+            {% if field.errors %}
+                <span class="text-xs text-red-600 mt-1 block">
+                    {% for error in field.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </span>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="pt-4">
+            {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
