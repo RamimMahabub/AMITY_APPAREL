@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMITY Apparel | Textile Manufacturing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --navy: #0f1d2e;
+            --ink: #243244;
+            --teal: #0d9488;
+            --sand: #efe5d3;
+            --paper: #fffdf8;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 14% 8%, rgba(239, 229, 211, 0.75), rgba(239, 229, 211, 0) 36%),
+                radial-gradient(circle at 90% 22%, rgba(13, 148, 136, 0.15), rgba(13, 148, 136, 0) 38%),
+                linear-gradient(155deg, #f4f6f9 0%, #f8fafb 50%, #edf4f3 100%);
+            min-height: 100vh;
+        }
+
+        .serif-heading {
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: -0.015em;
+        }
+
+        .hero-grid {
+            background:
+                linear-gradient(130deg, rgba(15, 29, 46, 0.95), rgba(15, 29, 46, 0.84)),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.08) 0,
+                    rgba(255, 255, 255, 0.08) 1px,
+                    rgba(255, 255, 255, 0) 1px,
+                    rgba(255, 255, 255, 0) 13px
+                );
+        }
+
+        .fade-up {
+            animation: fadeUp 0.75s ease both;
+        }
+
+        .fade-up-delay {
+            animation: fadeUp 0.95s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="selection:bg-teal-200/70">
+    <header class="sticky top-0 z-30 backdrop-blur border-b border-slate-200/80 bg-white/75">
+        <nav class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white text-sm font-bold">A</span>
+                <div>
+                    <p class="text-xs tracking-[0.26em] uppercase text-slate-500">Since 2009</p>
+                    <p class="serif-heading text-2xl leading-none text-slate-900">AMITY Apparel</p>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-3 sm:gap-4">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.dashboard') }}" class="inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition">Go to dashboard</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="inline-flex items-center rounded-full bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-600 transition">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12 lg:py-16">
+        <section class="hero-grid relative overflow-hidden rounded-[2rem] p-7 sm:p-10 lg:p-14 text-white shadow-2xl shadow-slate-900/20">
+            <div class="absolute -right-24 top-10 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl"></div>
+            <div class="absolute right-10 bottom-8 h-28 w-28 rounded-full border border-white/30"></div>
+
+            <div class="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                <div class="fade-up">
+                    <p class="text-xs sm:text-sm uppercase tracking-[0.24em] text-slate-200 mb-4">Integrated knitwear manufacturing</p>
+                    <h1 class="serif-heading text-5xl sm:text-6xl lg:text-7xl leading-[0.95] mb-5">Built to deliver quality textiles at scale.</h1>
+                    <p class="text-base sm:text-lg text-slate-200/95 max-w-xl">From yarn sourcing to knitting, dyeing, and shipment, AMITY connects every stage into one production rhythm with consistent quality control.</p>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.dashboard') }}" class="rounded-full bg-white text-slate-900 px-6 py-3 text-sm font-bold hover:bg-slate-100 transition">Open ERP workspace</a>
+                        {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="rounded-full bg-white text-slate-900 px-6 py-3 text-sm font-bold hover:bg-slate-100 transition">Login to ERP</a>
+                        {% endif %}
+                        <a href="#capabilities" class="rounded-full border border-white/45 px-6 py-3 text-sm font-semibold hover:bg-white/10 transition">Explore capabilities</a>
+                    </div>
+                </div>
+
+                <div class="fade-up-delay grid grid-cols-2 gap-4">
+                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20">
+                        <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Capacity</p>
+                        <p class="serif-heading text-4xl mt-3">15M+</p>
+                        <p class="text-sm text-slate-200/90 mt-2">Pieces annual output across seasonal programs.</p>
+                    </article>
+                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20">
+                        <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Export Ready</p>
+                        <p class="serif-heading text-4xl mt-3">30+</p>
+                        <p class="text-sm text-slate-200/90 mt-2">Global clients served with compliant shipment flow.</p>
+                    </article>
+                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20 col-span-2">
+                        <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Process Stack</p>
+                        <p class="text-lg font-bold mt-3">Yarn, Knitting, Dyeing, Orders, Shipment</p>
+                        <p class="text-sm text-slate-200/90 mt-2">A single production backbone with traceable data from planning to dispatch.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities" class="mt-10 lg:mt-14 grid md:grid-cols-3 gap-5">
+            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+                <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Yarn & sourcing</p>
+                <h2 class="serif-heading text-3xl text-slate-900 mt-3">Inventory confidence</h2>
+                <p class="text-sm text-slate-600 mt-3">Track received lots, quality profile, and supplier reliability before production starts.</p>
+            </article>
+            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+                <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Production control</p>
+                <h2 class="serif-heading text-3xl text-slate-900 mt-3">Real-time floor pulse</h2>
+                <p class="text-sm text-slate-600 mt-3">Follow knitting and dyeing status with stage-level visibility to reduce bottlenecks.</p>
+            </article>
+            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+                <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Delivery chain</p>
+                <h2 class="serif-heading text-3xl text-slate-900 mt-3">On-time dispatch</h2>
+                <p class="text-sm text-slate-600 mt-3">Coordinate order commitments and shipment records with transparent movement tracking.</p>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

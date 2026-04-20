@@ -20,6 +20,7 @@
                     <th scope="col" class="px-6 py-3">Price/kg</th>
                     <th scope="col" class="px-6 py-3">Status</th>
                     <th scope="col" class="px-6 py-3">Date</th>
+                    <th scope="col" class="px-6 py-3">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,10 +40,16 @@
                         {% endif %}
                     </td>
                     <td class="px-6 py-4">{{ purchase.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-2">
+                            <a href="{{ url_for('yarn.edit_purchase', purchase_id=purchase.id) }}" class="inline-flex items-center text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-3 py-2">Edit</a>
+                            <a href="{{ url_for('yarn.receipt', purchase_id=purchase.id) }}" target="_blank" class="inline-flex items-center text-white bg-slate-700 hover:bg-slate-800 font-medium rounded-lg text-xs px-3 py-2">Print Receipt</a>
+                        </div>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" class="px-6 py-4 text-center">No purchases recorded yet.</td>
+                    <td colspan="9" class="px-6 py-4 text-center">No purchases recorded yet.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -27,6 +27,7 @@ class Supplier(db.Model):
     name = db.Column(db.String(128), nullable=False)
     contact_person = db.Column(db.String(64))
     phone = db.Column(db.String(32))
+    email = db.Column(db.String(120))
     address = db.Column(db.Text)
     yarn_purchases = db.relationship('YarnPurchase', backref='supplier', lazy=True)
 

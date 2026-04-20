@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yarn Receipt #{{ purchase.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 24px;
+            color: #1f2937;
+        }
+
+        .receipt {
+            max-width: 820px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 24px;
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 16px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .actions {
+            max-width: 820px;
+            margin: 16px auto 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-back {
+            background: #e5e7eb;
+            color: #111827;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+
+            .actions {
+                display: none;
+            }
+
+            .receipt {
+                border: none;
+                border-radius: 0;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="header">
+            <h1>Yarn Purchase Receipt</h1>
+            <p>Receipt ID #{{ purchase.id }} | Date {{ purchase.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+
+        <div class="section">
+            <div class="grid">
+                <div>
+                    <div class="label">Supplier</div>
+                    <div class="value">{{ purchase.supplier.name }}</div>
+                </div>
+                <div>
+                    <div class="label">Contact Person</div>
+                    <div class="value">{{ purchase.supplier.contact_person or '-' }}</div>
+                </div>
+                <div>
+                    <div class="label">Phone</div>
+                    <div class="value">{{ purchase.supplier.phone or '-' }}</div>
+                </div>
+                <div>
+                    <div class="label">Email</div>
+                    <div class="value">{{ purchase.supplier.email or '-' }}</div>
+                </div>
+                <div style="grid-column: 1 / span 2;">
+                    <div class="label">Address</div>
+                    <div class="value">{{ purchase.supplier.address or '-' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="grid">
+                <div>
+                    <div class="label">Yarn Type</div>
+                    <div class="value">{{ purchase.yarn_type }}</div>
+                </div>
+                <div>
+                    <div class="label">Color</div>
+                    <div class="value">{{ purchase.color }}</div>
+                </div>
+                <div>
+                    <div class="label">Quantity (kg)</div>
+                    <div class="value">{{ purchase.qty_kg }}</div>
+                </div>
+                <div>
+                    <div class="label">Price per kg</div>
+                    <div class="value">${{ purchase.price_per_kg }}</div>
+                </div>
+                <div>
+                    <div class="label">Status</div>
+                    <div class="value">{{ purchase.status }}</div>
+                </div>
+                <div>
+                    <div class="label">Total Value</div>
+                    <div class="value">${{ '%.2f'|format((purchase.qty_kg|float) * (purchase.price_per_kg|float)) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-print" onclick="window.print()">Print Receipt</button>
+        <a class="btn btn-back" href="{{ url_for('yarn.inventory') }}">Back to Inventory</a>
+    </div>
+</body>
+</html>

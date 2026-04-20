@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -36,7 +36,9 @@ def create_app(config_class=Config):
 
     @app.route('/')
     def index():
-        from flask import redirect, url_for
-        return redirect(url_for('auth.dashboard'))
+        from flask_login import current_user
+        if current_user.is_authenticated:
+            return redirect(url_for('auth.dashboard'))
+        return render_template('home.html')
 
     return app

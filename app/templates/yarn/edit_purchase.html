@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Edit Yarn Purchase - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-100 mt-6">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Edit Yarn Purchase #{{ purchase.id }}</h2>
+        {% if back_url %}
+        <a href="{{ back_url }}" class="text-sm text-blue-600 hover:underline">&larr; Back</a>
+        {% endif %}
+    </div>
+
+    <form method="POST" action="" class="space-y-5">
+        {{ form.hidden_tag() }}
+
+        <div>
+            {{ form.supplier_id.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+            {{ form.supplier_id(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+        </div>
+
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold text-gray-800">Need to update supplier details?</p>
+                    <p class="text-xs text-gray-600 mt-1">Use the modal to edit or create supplier information.</p>
+                </div>
+                <button type="button" id="open-supplier-modal" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-4 py-2.5">Supplier Details</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                {{ form.yarn_type.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                {{ form.yarn_type(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            </div>
+            <div>
+                {{ form.color.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                {{ form.color(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            </div>
+            <div>
+                {{ form.qty_kg.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                {{ form.qty_kg(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            </div>
+            <div>
+                {{ form.price_per_kg.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                {{ form.price_per_kg(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            </div>
+            <div>
+                {{ form.status.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                {{ form.status(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            </div>
+        </div>
+
+        <div class="pt-2 flex items-center gap-3">
+            {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center") }}
+            <a href="{{ url_for('yarn.inventory') }}" class="text-sm text-gray-600 hover:underline">Cancel</a>
+        </div>
+
+        <div id="supplier-modal" class="hidden fixed inset-0 z-[100] bg-black/45 p-4 sm:p-6">
+            <div class="w-full max-w-2xl mx-auto mt-6 sm:mt-10 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-800">Supplier Details</h3>
+                    <button type="button" id="close-supplier-modal" class="text-gray-500 hover:text-gray-700 text-xl leading-none">&times;</button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div>
+                        {{ form.new_supplier_name.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.new_supplier_name(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5", placeholder="e.g. Apex Yarn Mills") }}
+                    </div>
+                    <div>
+                        {{ form.supplier_contact_person.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.supplier_contact_person(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            {{ form.supplier_phone.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.supplier_phone(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                        </div>
+                        <div>
+                            {{ form.supplier_email.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.supplier_email(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                        </div>
+                    </div>
+                    <div>
+                        {{ form.supplier_address.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.supplier_address(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3 bg-gray-50">
+                    <button type="button" id="close-supplier-modal-bottom" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2.5">Done</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+(function() {
+    const modal = document.getElementById('supplier-modal');
+    const openBtn = document.getElementById('open-supplier-modal');
+    const closeBtn = document.getElementById('close-supplier-modal');
+    const closeBottomBtn = document.getElementById('close-supplier-modal-bottom');
+
+    if (!modal || !openBtn || !closeBtn || !closeBottomBtn) return;
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    closeBottomBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(evt) {
+        if (evt.target === modal) closeModal();
+    });
+})();
+</script>
+{% endblock %}

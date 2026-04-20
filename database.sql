@@ -69,11 +69,12 @@ CREATE TABLE suppliers (
 	name VARCHAR(128) NOT NULL, 
 	contact_person VARCHAR(64), 
 	phone VARCHAR(32), 
+	email VARCHAR(120), 
 	address TEXT, 
 	PRIMARY KEY (id)
 );
-INSERT INTO "suppliers" VALUES(1,'Global Yarns Ltd','John Doe','123-456','Dhaka');
-INSERT INTO "suppliers" VALUES(2,'Premium Threads Inc','Jane Smith','987-654','Chattogram');
+INSERT INTO "suppliers" VALUES(1,'Global Yarns Ltd','John Doe','123-456','john@globalyarns.com','Dhaka');
+INSERT INTO "suppliers" VALUES(2,'Premium Threads Inc','Jane Smith','987-654','jane@premiumthreads.com','Chattogram');
 CREATE TABLE users (
 	id INTEGER NOT NULL, 
 	username VARCHAR(64) NOT NULL, 

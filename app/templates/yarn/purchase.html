@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-100 mt-6">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">{{ title }}</h2>
+        {% if back_url %}
+        <a href="{{ back_url }}" class="text-sm text-blue-600 hover:underline">&larr; Back</a>
+        {% endif %}
+    </div>
+
+    <form method="POST" action="" class="space-y-5">
+        {{ form.hidden_tag() }}
+
+        <div>
+            {{ form.supplier_id.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+            {{ form.supplier_id(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+            {% if form.supplier_id.errors %}
+            <span class="text-xs text-red-600 mt-1 block">{% for error in form.supplier_id.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+            {% endif %}
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold text-gray-800">Need to add a new supplier?</p>
+                    <p class="text-xs text-gray-600 mt-1">Use the modal to add supplier details.</p>
+                </div>
+                <button type="button" id="open-supplier-modal" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-4 py-2.5">
+                    Add Supplier
+                </button>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-5">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-800">Yarn Items</h3>
+                <button type="button" id="add-yarn-row" class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2">Add Another Yarn</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">You can record multiple yarn items in one submission.</p>
+
+            <div id="yarn-items" class="space-y-4">
+                <div class="yarn-row rounded-lg border border-gray-200 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            {{ form.yarn_type.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.yarn_type(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+                            {% if form.yarn_type.errors %}
+                            <span class="text-xs text-red-600 mt-1 block">{% for error in form.yarn_type.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {{ form.color.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.color(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+                            {% if form.color.errors %}
+                            <span class="text-xs text-red-600 mt-1 block">{% for error in form.color.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {{ form.qty_kg.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.qty_kg(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+                            {% if form.qty_kg.errors %}
+                            <span class="text-xs text-red-600 mt-1 block">{% for error in form.qty_kg.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {{ form.price_per_kg.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.price_per_kg(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+                            {% if form.price_per_kg.errors %}
+                            <span class="text-xs text-red-600 mt-1 block">{% for error in form.price_per_kg.errors %}{{ error }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-2">
+            {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center") }}
+        </div>
+
+        <div id="supplier-modal" class="hidden fixed inset-0 z-[100] bg-black/45 p-4 sm:p-6">
+            <div class="w-full max-w-2xl mx-auto mt-6 sm:mt-10 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-800">Add New Supplier</h3>
+                    <button type="button" id="close-supplier-modal" class="text-gray-500 hover:text-gray-700 text-xl leading-none">&times;</button>
+                </div>
+
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div>
+                        {{ form.new_supplier_name.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.new_supplier_name(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5", placeholder="e.g. Apex Yarn Mills") }}
+                    </div>
+                    <div>
+                        {{ form.supplier_contact_person.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.supplier_contact_person(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            {{ form.supplier_phone.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.supplier_phone(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                        </div>
+                        <div>
+                            {{ form.supplier_email.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                            {{ form.supplier_email(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                        </div>
+                    </div>
+                    <div>
+                        {{ form.supplier_address.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                        {{ form.supplier_address(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5") }}
+                    </div>
+                </div>
+
+                <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3 bg-gray-50">
+                    <span id="supplier-modal-status" class="hidden text-xs mr-auto"></span>
+                    <button type="button" id="clear-supplier-modal" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2.5">Clear</button>
+                    <button type="button" id="save-supplier-modal" class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm px-4 py-2.5">Save Supplier Info</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function() {
+        const yarnItems = document.getElementById('yarn-items');
+        const addYarnBtn = document.getElementById('add-yarn-row');
+        const modal = document.getElementById('supplier-modal');
+        const openBtn = document.getElementById('open-supplier-modal');
+        const closeBtn = document.getElementById('close-supplier-modal');
+        const saveBtn = document.getElementById('save-supplier-modal');
+        const clearBtn = document.getElementById('clear-supplier-modal');
+        const statusEl = document.getElementById('supplier-modal-status');
+
+        const supplierSelect = document.getElementById('{{ form.supplier_id.id }}');
+        const csrfInput = document.getElementById('csrf_token');
+        const newSupplierInput = document.getElementById('{{ form.new_supplier_name.id }}');
+        const contactInput = document.getElementById('{{ form.supplier_contact_person.id }}');
+        const phoneInput = document.getElementById('{{ form.supplier_phone.id }}');
+        const emailInput = document.getElementById('{{ form.supplier_email.id }}');
+        const addressInput = document.getElementById('{{ form.supplier_address.id }}');
+
+        function buildExtraRow() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'yarn-row rounded-lg border border-gray-200 p-4 relative';
+            wrapper.innerHTML = `
+                <button type="button" class="remove-yarn-row absolute top-3 right-3 text-xs text-red-600 hover:underline">Remove</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Yarn Type</label>
+                        <input name="extra_yarn_type[]" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Color</label>
+                        <input name="extra_color[]" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Quantity (kg)</label>
+                        <input name="extra_qty_kg[]" type="number" step="0.01" min="0.01" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Price per kg ($)</label>
+                        <input name="extra_price_per_kg[]" type="number" step="0.01" min="0.01" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                    </div>
+                </div>
+            `;
+            return wrapper;
+        }
+
+        if (addYarnBtn && yarnItems) {
+            addYarnBtn.addEventListener('click', function() {
+                yarnItems.appendChild(buildExtraRow());
+            });
+
+            yarnItems.addEventListener('click', function(evt) {
+                const target = evt.target;
+                if (target && target.classList.contains('remove-yarn-row')) {
+                    const row = target.closest('.yarn-row');
+                    if (row) row.remove();
+                }
+            });
+        }
+
+        if (!modal || !openBtn || !closeBtn || !saveBtn || !clearBtn) {
+            return;
+        }
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function setStatus(message, type) {
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.classList.remove('hidden', 'text-red-600', 'text-green-700');
+            statusEl.classList.add(type === 'error' ? 'text-red-600' : 'text-green-700');
+        }
+
+        function clearStatus() {
+            if (!statusEl) return;
+            statusEl.textContent = '';
+            statusEl.classList.add('hidden');
+            statusEl.classList.remove('text-red-600', 'text-green-700');
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        saveBtn.addEventListener('click', async function() {
+            clearStatus();
+
+            if (!newSupplierInput || !newSupplierInput.value.trim()) {
+                setStatus('Please enter a supplier name.', 'error');
+                return;
+            }
+
+            const formData = new URLSearchParams();
+            formData.append('name', newSupplierInput.value.trim());
+            formData.append('contact_person', contactInput ? contactInput.value.trim() : '');
+            formData.append('phone', phoneInput ? phoneInput.value.trim() : '');
+            formData.append('email', emailInput ? emailInput.value.trim() : '');
+            formData.append('address', addressInput ? addressInput.value.trim() : '');
+            if (csrfInput && csrfInput.value) {
+                formData.append('csrf_token', csrfInput.value);
+            }
+
+            saveBtn.disabled = true;
+            try {
+                const response = await fetch('{{ url_for("yarn.create_supplier") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body: formData.toString()
+                });
+
+                const payload = await response.json();
+                if (!response.ok || !payload.ok) {
+                    setStatus(payload.message || 'Unable to save supplier.', 'error');
+                    return;
+                }
+
+                if (supplierSelect) {
+                    let option = Array.from(supplierSelect.options).find(function(o) {
+                        return Number(o.value) === Number(payload.id);
+                    });
+
+                    if (!option) {
+                        option = new Option(payload.name, payload.id);
+                        supplierSelect.add(option);
+                    }
+
+                    supplierSelect.value = String(payload.id);
+                }
+
+                if (newSupplierInput) newSupplierInput.value = '';
+                if (contactInput) contactInput.value = '';
+                if (phoneInput) phoneInput.value = '';
+                if (emailInput) emailInput.value = '';
+                if (addressInput) addressInput.value = '';
+
+                closeModal();
+            } catch (err) {
+                setStatus('Network error while saving supplier.', 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        });
+
+        modal.addEventListener('click', function(evt) {
+            if (evt.target === modal) {
+                closeModal();
+            }
+        });
+
+        clearBtn.addEventListener('click', function() {
+            clearStatus();
+            if (newSupplierInput) newSupplierInput.value = '';
+            if (contactInput) contactInput.value = '';
+            if (phoneInput) phoneInput.value = '';
+            if (emailInput) emailInput.value = '';
+            if (addressInput) addressInput.value = '';
+        });
+    })();
+</script>
+{% endblock %}
