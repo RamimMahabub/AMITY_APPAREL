@@ -10,20 +10,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --navy: #0f1d2e;
-            --ink: #243244;
-            --teal: #0d9488;
-            --sand: #efe5d3;
-            --paper: #fffdf8;
+            --cp-bg: #070a17;
+            --cp-bg-2: #10132a;
+            --cp-cyan: #40f5ff;
+            --cp-pink: #ff3fd1;
+            --cp-violet: #7c6bff;
+            --cp-text: #e5eeff;
+            --cp-soft: #a6b8e8;
         }
 
         body {
             font-family: 'Manrope', sans-serif;
-            color: var(--ink);
+            color: var(--cp-text);
             background:
-                radial-gradient(circle at 14% 8%, rgba(239, 229, 211, 0.75), rgba(239, 229, 211, 0) 36%),
-                radial-gradient(circle at 90% 22%, rgba(13, 148, 136, 0.15), rgba(13, 148, 136, 0) 38%),
-                linear-gradient(155deg, #f4f6f9 0%, #f8fafb 50%, #edf4f3 100%);
+                radial-gradient(circle at 8% 10%, rgba(124, 107, 255, 0.25), rgba(124, 107, 255, 0) 36%),
+                radial-gradient(circle at 92% 12%, rgba(255, 63, 209, 0.2), rgba(255, 63, 209, 0) 34%),
+                radial-gradient(circle at 55% 100%, rgba(64, 245, 255, 0.18), rgba(64, 245, 255, 0) 35%),
+                linear-gradient(155deg, var(--cp-bg) 0%, var(--cp-bg-2) 58%, #161a34 100%);
             min-height: 100vh;
         }
 
@@ -33,15 +36,38 @@
         }
 
         .hero-grid {
+            background: linear-gradient(140deg, rgba(8, 12, 26, 0.85), rgba(17, 12, 36, 0.8));
+            border: 1px solid rgba(64, 245, 255, 0.25);
+            box-shadow: 0 0 0 1px rgba(124, 107, 255, 0.2), 0 22px 44px rgba(0, 0, 0, 0.45);
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            filter: saturate(1.15) contrast(1.02);
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
             background:
-                linear-gradient(130deg, rgba(15, 29, 46, 0.95), rgba(15, 29, 46, 0.84)),
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(255, 255, 255, 0.08) 0,
-                    rgba(255, 255, 255, 0.08) 1px,
-                    rgba(255, 255, 255, 0) 1px,
-                    rgba(255, 255, 255, 0) 13px
-                );
+                linear-gradient(110deg, rgba(7, 10, 24, 0.88) 0%, rgba(10, 14, 30, 0.72) 45%, rgba(12, 18, 36, 0.45) 100%),
+                radial-gradient(circle at 85% 18%, rgba(64, 245, 255, 0.22), rgba(64, 245, 255, 0) 38%),
+                radial-gradient(circle at 20% 90%, rgba(255, 63, 209, 0.18), rgba(255, 63, 209, 0) 32%);
+        }
+
+        .cyber-card {
+            background: rgba(20, 30, 52, 0.58);
+            border: 1px solid rgba(165, 187, 255, 0.22);
+            backdrop-filter: blur(6px);
         }
 
         .fade-up {
@@ -65,21 +91,21 @@
     </style>
 </head>
 <body class="selection:bg-teal-200/70">
-    <header class="sticky top-0 z-30 backdrop-blur border-b border-slate-200/80 bg-white/75">
+    <header class="sticky top-0 z-30 backdrop-blur border-b border-cyan-300/20 bg-slate-950/65">
         <nav class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
             <a href="{{ url_for('index') }}" class="flex items-center gap-3">
-                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white text-sm font-bold">A</span>
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white text-sm font-bold border border-cyan-300/30">A</span>
                 <div>
-                    <p class="text-xs tracking-[0.26em] uppercase text-slate-500">Since 2009</p>
-                    <p class="serif-heading text-2xl leading-none text-slate-900">AMITY Apparel</p>
+                    <p class="text-xs tracking-[0.26em] uppercase text-slate-300">Since 2009</p>
+                    <p class="serif-heading text-2xl leading-none text-cyan-200">AMITY Apparel</p>
                 </div>
             </a>
 
             <div class="flex items-center gap-3 sm:gap-4">
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('auth.dashboard') }}" class="inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition">Go to dashboard</a>
+                <a href="{{ url_for('auth.dashboard') }}" class="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition border border-cyan-300/35 bg-gradient-to-r from-violet-600 to-sky-600 hover:brightness-110">Go to dashboard</a>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="inline-flex items-center rounded-full bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-600 transition">Login</a>
+                <a href="{{ url_for('auth.login') }}" class="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition border border-cyan-300/35 bg-gradient-to-r from-violet-600 to-sky-600 hover:brightness-110">Login</a>
                 {% endif %}
             </div>
         </nav>
@@ -87,6 +113,12 @@
 
     <main class="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12 lg:py-16">
         <section class="hero-grid relative overflow-hidden rounded-[2rem] p-7 sm:p-10 lg:p-14 text-white shadow-2xl shadow-slate-900/20">
+            <div id="hero-slides" class="absolute inset-0">
+                <div class="hero-slide active" style="background-image: url('{{ url_for('static', filename='images/hero/bd-factory-1.jpg') }}');"></div>
+                <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/hero/bd-factory-2.jpg') }}');"></div>
+                <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/hero/bd-factory-3.jpg') }}');"></div>
+            </div>
+            <div class="hero-overlay"></div>
             <div class="absolute -right-24 top-10 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl"></div>
             <div class="absolute right-10 bottom-8 h-28 w-28 rounded-full border border-white/30"></div>
 
@@ -106,17 +138,17 @@
                 </div>
 
                 <div class="fade-up-delay grid grid-cols-2 gap-4">
-                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20">
+                    <article class="cyber-card rounded-2xl p-5">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Capacity</p>
                         <p class="serif-heading text-4xl mt-3">15M+</p>
                         <p class="text-sm text-slate-200/90 mt-2">Pieces annual output across seasonal programs.</p>
                     </article>
-                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20">
+                    <article class="cyber-card rounded-2xl p-5">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Export Ready</p>
                         <p class="serif-heading text-4xl mt-3">30+</p>
                         <p class="text-sm text-slate-200/90 mt-2">Global clients served with compliant shipment flow.</p>
                     </article>
-                    <article class="rounded-2xl bg-white/10 p-5 border border-white/20 col-span-2">
+                    <article class="cyber-card rounded-2xl p-5 col-span-2">
                         <p class="text-xs uppercase tracking-[0.2em] text-slate-200">Process Stack</p>
                         <p class="text-lg font-bold mt-3">Yarn, Knitting, Dyeing, Orders, Shipment</p>
                         <p class="text-sm text-slate-200/90 mt-2">A single production backbone with traceable data from planning to dispatch.</p>
@@ -126,22 +158,35 @@
         </section>
 
         <section id="capabilities" class="mt-10 lg:mt-14 grid md:grid-cols-3 gap-5">
-            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+            <article class="rounded-2xl border border-cyan-300/20 p-6 shadow-lg shadow-slate-900/30 bg-slate-900/45">
                 <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Yarn & sourcing</p>
-                <h2 class="serif-heading text-3xl text-slate-900 mt-3">Inventory confidence</h2>
+                <h2 class="serif-heading text-3xl text-cyan-100 mt-3">Inventory confidence</h2>
                 <p class="text-sm text-slate-600 mt-3">Track received lots, quality profile, and supplier reliability before production starts.</p>
             </article>
-            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+            <article class="rounded-2xl border border-cyan-300/20 p-6 shadow-lg shadow-slate-900/30 bg-slate-900/45">
                 <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Production control</p>
-                <h2 class="serif-heading text-3xl text-slate-900 mt-3">Real-time floor pulse</h2>
+                <h2 class="serif-heading text-3xl text-cyan-100 mt-3">Real-time floor pulse</h2>
                 <p class="text-sm text-slate-600 mt-3">Follow knitting and dyeing status with stage-level visibility to reduce bottlenecks.</p>
             </article>
-            <article class="rounded-2xl bg-white/90 border border-slate-200 p-6 shadow-lg shadow-slate-900/5">
+            <article class="rounded-2xl border border-cyan-300/20 p-6 shadow-lg shadow-slate-900/30 bg-slate-900/45">
                 <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Delivery chain</p>
-                <h2 class="serif-heading text-3xl text-slate-900 mt-3">On-time dispatch</h2>
+                <h2 class="serif-heading text-3xl text-cyan-100 mt-3">On-time dispatch</h2>
                 <p class="text-sm text-slate-600 mt-3">Coordinate order commitments and shipment records with transparent movement tracking.</p>
             </article>
         </section>
     </main>
+
+    <script>
+        (function () {
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+            if (!slides.length) return;
+            let index = 0;
+            setInterval(function () {
+                slides[index].classList.remove('active');
+                index = (index + 1) % slides.length;
+                slides[index].classList.add('active');
+            }, 4500);
+        })();
+    </script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,6 +17,8 @@ csrf = CSRFProtect()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    os.makedirs(app.instance_path, exist_ok=True)
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -33,6 +37,9 @@ def create_app(config_class=Config):
 
     from app.orders.routes import orders as orders_bp
     app.register_blueprint(orders_bp, url_prefix='/orders')
+
+    from app.payroll.routes import payroll as payroll_bp
+    app.register_blueprint(payroll_bp, url_prefix='/payroll')
 
     @app.route('/')
     def index():

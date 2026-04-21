@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}New Employee - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Add Employee / Worker</h2>
+    <form method="POST" class="space-y-4">
+        {{ form.hidden_tag() }}
+
+        <div>
+            {{ form.employee_code.label(class="block mb-1 text-sm font-medium") }}
+            {{ form.employee_code(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+        </div>
+
+        <div>
+            {{ form.full_name.label(class="block mb-1 text-sm font-medium") }}
+            {{ form.full_name(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                {{ form.designation.label(class="block mb-1 text-sm font-medium") }}
+                {{ form.designation(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+            </div>
+            <div>
+                {{ form.department.label(class="block mb-1 text-sm font-medium") }}
+                {{ form.department(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                {{ form.monthly_salary.label(class="block mb-1 text-sm font-medium") }}
+                {{ form.monthly_salary(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+            </div>
+            <div>
+                {{ form.join_date.label(class="block mb-1 text-sm font-medium") }}
+                {{ form.join_date(class="w-full rounded-lg border border-gray-300 p-2.5") }}
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            {{ form.is_active(class="rounded border-gray-300") }}
+            {{ form.is_active.label(class="text-sm font-medium") }}
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            {{ form.submit(class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5") }}
+            <a href="{{ url_for('payroll.employee_list') }}" class="text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm px-5 py-2.5">Back</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

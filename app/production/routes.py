@@ -124,6 +124,8 @@ def stage_update(stage_id):
     stage = ProductionStage.query.get_or_404(stage_id)
     form = UpdateProductionStageForm(obj=stage)
     if form.validate_on_submit():
+        stage.stage_name = form.stage_name.data
+        stage.input_qty = form.input_qty.data
         stage.output_qty = form.output_qty.data
         stage.waste = form.waste.data
         stage.status = form.status.data

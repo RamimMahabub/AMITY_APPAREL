@@ -33,6 +33,8 @@ class ProductionStageForm(FlaskForm):
     submit = SubmitField('Start Stage')
 
 class UpdateProductionStageForm(FlaskForm):
+    stage_name = SelectField('Stage Name', choices=[('Cutting', 'Cutting'), ('Sewing', 'Sewing'), ('Finishing', 'Finishing'), ('Packing', 'Packing')], validators=[DataRequired()])
+    input_qty = IntegerField('Input Quantity (pcs)', validators=[DataRequired(), NumberRange(min=1)])
     output_qty = IntegerField('Output Quantity (pcs)', validators=[DataRequired(), NumberRange(min=0)])
     waste = IntegerField('Waste (pcs)', validators=[DataRequired(), NumberRange(min=0)])
     status = SelectField('Status', choices=[('In Progress', 'In Progress'), ('Completed', 'Completed')], validators=[DataRequired()])

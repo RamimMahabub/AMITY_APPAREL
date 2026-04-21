@@ -1,8 +1,14 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 instance/
+*.db
+database.sql
 .env
 uploads/
+app/static/uploads/
 .pytest_cache/
 .DS_Store

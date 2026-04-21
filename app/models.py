@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login_manager
-from datetime import datetime
+from datetime import date, datetime
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='Staff')  # Admin, Manager, Staff
+    recorded_salary_payments = db.relationship('SalaryPayment', backref='paid_by', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -102,3 +103,28 @@ class Shipment(db.Model):
     shipping_date = db.Column(db.DateTime)
     final_qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), default='Pending')  # Pending, Shipped
+
+
+class Employee(db.Model):
+    __tablename__ = 'employees'
+    id = db.Column(db.Integer, primary_key=True)
+    employee_code = db.Column(db.String(32), unique=True, nullable=False, index=True)
+    full_name = db.Column(db.String(128), nullable=False)
+    designation = db.Column(db.String(64), nullable=False)
+    department = db.Column(db.String(64), nullable=False)
+    monthly_salary = db.Column(db.Numeric(12, 2), nullable=False)
+    join_date = db.Column(db.Date, nullable=False, default=date.today)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    salary_payments = db.relationship('SalaryPayment', backref='employee', lazy=True, cascade='all, delete-orphan')
+
+
+class SalaryPayment(db.Model):
+    __tablename__ = 'salary_payments'
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)
+    payment_month = db.Column(db.Date, nullable=False, index=True)  # Store first day of the month.
+    paid_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    paid_on = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    note = db.Column(db.String(255))
+    paid_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
