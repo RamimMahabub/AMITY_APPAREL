@@ -6,17 +6,6 @@
     <form class="space-y-6" method="POST" action="">
         {{ form.hidden_tag() }}
         <h5 class="text-xl font-medium text-gray-900">Sign in to AMITY Apparel ERP</h5>
-        
-        <!-- Flash messages specifically here if outside main layout -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
 
         <div>
             <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Your username</label>

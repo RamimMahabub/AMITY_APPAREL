@@ -23,3 +23,12 @@ class ShipmentForm(FlaskForm):
     final_qty = IntegerField('Final Quantity', validators=[DataRequired()])
     shipping_date = DateField('Shipping Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Create Shipment')
+
+
+class UpdateShipmentForm(FlaskForm):
+    order_id = SelectField('Order', coerce=int, validators=[DataRequired()])
+    container_no = StringField('Container Number', validators=[DataRequired()])
+    final_qty = IntegerField('Final Quantity', validators=[DataRequired()])
+    shipping_date = DateField('Shipping Date', format='%Y-%m-%d', validators=[Optional()])
+    status = SelectField('Status', choices=[('Pending', 'Pending'), ('Shipped', 'Shipped')], validators=[DataRequired()])
+    submit = SubmitField('Update Shipment')

@@ -6,7 +6,7 @@
     <h2 class="text-3xl font-bold mb-6 text-gray-800 tracking-wide">Overview</h2>
     
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
             <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Active Orders</h5>
             <span class="text-4xl font-extrabold text-blue-600">{{ total_active_orders }}</span>
@@ -18,6 +18,29 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
             <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Yarn Stock</h5>
             <span class="text-4xl font-extrabold text-indigo-500">{{ total_yarn_stock }} <span class="text-xl text-gray-400">kg</span></span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Estimated Profit</h5>
+            <span class="text-4xl font-extrabold text-green-600">${{ "{:,.2f}".format(estimated_profit) }}</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Delayed Orders</h5>
+            <span class="text-3xl font-bold text-red-600">{{ delayed_orders|length }}</span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Monthly Payroll</h5>
+            <span class="text-3xl font-bold text-pink-500">${{ "{:,.2f}".format(current_month_payroll) }}</span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Shipment Progress</h5>
+            <span class="text-3xl font-bold text-cyan-500">{{ "{:.2f}".format(shipment_progress) }}%</span>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <h5 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Production Efficiency</h5>
+            <span class="text-3xl font-bold text-purple-500">{{ "{:.2f}".format(production_efficiency) }}%</span>
         </div>
     </div>
 
@@ -36,6 +59,31 @@
     </div>
     {% endif %}
 
+    {% if low_stock_alerts %}
+    <div class="bg-amber-50 border-l-4 border-amber-500 text-amber-800 p-4 mb-8 rounded shadow-sm">
+        <p class="font-bold">Low Stock Alerts</p>
+        <ul class="list-disc pl-8 mt-2">
+            {% for alert in low_stock_alerts %}
+            <li>{{ alert.purchase.yarn_type }} - {{ alert.purchase.color }}: {{ "{:.2f}".format(alert.available_qty) }} kg available</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if delayed_orders %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+        <h3 class="text-xl font-semibold mb-3 text-red-600">Delayed Orders</h3>
+        <div class="space-y-2">
+            {% for order in delayed_orders %}
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg border border-red-100 bg-red-50 px-4 py-3">
+                <span class="font-semibold text-red-700">Order #{{ order.id }} - {{ order.product_name }}</span>
+                <span class="text-sm text-red-600">Deadline {{ order.deadline.strftime('%Y-%m-%d') }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -46,7 +94,7 @@
         </div>
         
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Monthly Shipment Volume (Est)</h3>
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Shipment Progress Snapshot</h3>
             <div class="relative h-64 w-full">
                 <canvas id="shipmentChart"></canvas>
             </div>
@@ -88,11 +136,11 @@
         new Chart(shipmentCtx, {
             type: 'bar',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: ['Progress', 'Pending'],
                 datasets: [{
-                    label: 'Containers Shipped',
-                    data: [2, 3, 1, 4, 3, 5], // Mocked past data + current
-                    backgroundColor: ['#7c6bff', '#955dff', '#ff3fd1', '#40f5ff', '#7c6bff', '#955dff'],
+                    label: 'Shipment Status',
+                    data: [{{ shipment_progress }}, {{ 100 - shipment_progress }}],
+                    backgroundColor: ['#40f5ff', '#7c6bff'],
                     borderColor: '#40f5ff',
                     borderWidth: 1,
                     borderRadius: 4

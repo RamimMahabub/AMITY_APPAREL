@@ -8,6 +8,7 @@ from app import db
 from app.auth.routes import role_required
 from app.models import Employee, SalaryPayment
 from app.payroll.forms import EmployeeForm
+from app.services import log_audit
 
 payroll = Blueprint('payroll', __name__)
 
@@ -106,6 +107,8 @@ def employee_new():
             is_active=bool(form.is_active.data),
         )
         db.session.add(employee)
+        db.session.flush()
+        log_audit('create', 'Employee', employee.id, user=current_user, after_data={'employee_code': employee.employee_code, 'full_name': employee.full_name, 'department': employee.department}, note='Employee created')
         db.session.commit()
         flash('Employee created successfully.', 'success')
         return redirect(url_for('payroll.employee_list'))
@@ -149,6 +152,7 @@ def pay_multiple():
 
         already_paid = paid_map.get(emp_id, 0.0)
         due = max(float(employee.monthly_salary or 0) - already_paid, 0.0)
+
         if due <= 0:
             continue
 
@@ -164,7 +168,7 @@ def pay_multiple():
             return redirect(url_for('payroll.employee_list', month=month_start.strftime('%Y-%m')))
 
         if pay_amount > due:
-            flash(f'Payment for {employee.full_name} exceeds due amount.', 'danger')
+            flash(f'Payment for {employee.full_name} exceeds the remaining due amount.', 'danger')
             return redirect(url_for('payroll.employee_list', month=month_start.strftime('%Y-%m')))
 
         payment = SalaryPayment(
@@ -178,6 +182,7 @@ def pay_multiple():
         db.session.add(payment)
         created_count += 1
         total_paid_now += pay_amount
+        log_audit('create', 'SalaryPayment', emp_id, user=current_user, after_data={'employee_id': emp_id, 'payment_month': month_start.isoformat(), 'paid_amount': pay_amount}, note='Salary payment recorded')
 
     if created_count == 0:
         flash('No payable due found for selected employees.', 'info')

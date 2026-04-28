@@ -224,11 +224,13 @@
 <aside id="sidebar-menu" class="fixed top-0 left-0 z-40 w-64 h-screen pt-16 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0" aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50">
         <ul class="space-y-2 font-medium">
+            {% if current_user.role != 'Manager' %}
             <li>
                 <a href="{{ url_for('auth.dashboard') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.endpoint == 'auth.dashboard' %}bg-gray-200{% endif %}">
                     <span class="ml-3">Dashboard</span>
                 </a>
             </li>
+            {% endif %}
             <li>
                 <a href="{{ url_for('yarn.inventory') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'yarn' in request.endpoint %}bg-gray-200{% endif %}">
                     <span class="ml-3">Yarn Inventory</span>
@@ -250,6 +252,16 @@
                 </a>
             </li>
             <li>
+                <a href="{{ url_for('orders.buyer_list') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.endpoint == 'orders.buyer_list' %}bg-gray-200{% endif %}">
+                    <span class="ml-3">Buyers</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('yarn.supplier_list') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if request.endpoint == 'yarn.supplier_list' %}bg-gray-200{% endif %}">
+                    <span class="ml-3">Companies</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('production.stage_list') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'stage' in request.endpoint %}bg-gray-200{% endif %}">
                     <span class="ml-3">Production Stages</span>
                 </a>
@@ -263,6 +275,11 @@
             <li>
                 <a href="{{ url_for('payroll.employee_list') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'payroll' in request.endpoint %}bg-gray-200{% endif %}">
                     <span class="ml-3">Payroll</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('expenses.expense_list') }}" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group {% if 'expenses' in request.endpoint %}bg-gray-200{% endif %}">
+                    <span class="ml-3">Expenses</span>
                 </a>
             </li>
             {% endif %}

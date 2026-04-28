@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
-from flask_login import login_required
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 from app import db
-from app.models import YarnPurchase, Supplier
+from app.models import InventoryLedger, Supplier, YarnPurchase
 from app.yarn.forms import YarnPurchaseForm
 from app.auth.routes import role_required
 from decimal import Decimal, InvalidOperation
+from app.services import get_low_stock_purchases, get_total_yarn_stock, log_audit, record_inventory_in
 
 yarn = Blueprint('yarn', __name__)
 
@@ -12,7 +13,9 @@ yarn = Blueprint('yarn', __name__)
 @login_required
 def inventory():
     purchases = YarnPurchase.query.order_by(YarnPurchase.created_at.desc()).all()
-    return render_template('yarn/inventory.html', purchases=purchases)
+    low_stock_alerts = get_low_stock_purchases()
+    total_yarn_stock = get_total_yarn_stock()
+    return render_template('yarn/inventory.html', purchases=purchases, low_stock_alerts=low_stock_alerts, total_yarn_stock=total_yarn_stock)
 
 
 @yarn.route('/supplier/create', methods=['POST'])
@@ -50,6 +53,14 @@ def create_supplier():
 
     db.session.commit()
     return jsonify({'ok': True, 'id': supplier.id, 'name': supplier.name})
+
+
+@yarn.route('/companies', methods=['GET'])
+@login_required
+@role_required(['Admin', 'Manager'])
+def supplier_list():
+    suppliers = Supplier.query.order_by(Supplier.name.asc()).all()
+    return render_template('yarn/supplier_list.html', suppliers=suppliers)
 
 @yarn.route('/purchase', methods=['GET', 'POST'])
 @login_required
@@ -144,15 +155,24 @@ def purchase():
             )
 
         for item in items:
-            db.session.add(
-                YarnPurchase(
-                    supplier_id=supplier_id,
-                    yarn_type=item['yarn_type'],
-                    color=item['color'],
-                    qty_kg=item['qty_kg'],
-                    price_per_kg=item['price_per_kg'],
-                    status='Received'
-                )
+            purchase = YarnPurchase(
+                supplier_id=supplier_id,
+                yarn_type=item['yarn_type'],
+                color=item['color'],
+                qty_kg=item['qty_kg'],
+                price_per_kg=item['price_per_kg'],
+                status='Received',
+            )
+            db.session.add(purchase)
+            db.session.flush()
+            db.session.add(record_inventory_in(purchase, user=current_user, note='Yarn purchase received into stock'))
+            log_audit(
+                'create',
+                'YarnPurchase',
+                purchase.id,
+                user=current_user,
+                after_data={'qty_kg': float(item['qty_kg']), 'price_per_kg': float(item['price_per_kg'])},
+                note='Yarn purchase recorded',
             )
 
         db.session.commit()
@@ -181,6 +201,21 @@ def edit_purchase(purchase_id):
     form.status.data = purchase.status
 
     if form.validate_on_submit():
+        original_data = {
+            'supplier_id': purchase.supplier_id,
+            'yarn_type': purchase.yarn_type,
+            'color': purchase.color,
+            'qty_kg': float(purchase.qty_kg),
+            'price_per_kg': float(purchase.price_per_kg),
+            'status': purchase.status,
+        }
+        initial_inventory = InventoryLedger.query.filter_by(
+            yarn_purchase_id=purchase.id,
+            movement_type='IN',
+            reference_type='YarnPurchase',
+            reference_id=purchase.id,
+        ).first()
+        has_outgoing = InventoryLedger.query.filter_by(yarn_purchase_id=purchase.id, movement_type='OUT').first() is not None
         new_supplier_name = (form.new_supplier_name.data or '').strip()
         supplier_id = form.supplier_id.data
         contact_person = (form.supplier_contact_person.data or '').strip()
@@ -215,12 +250,37 @@ def edit_purchase(purchase_id):
             flash('Please select an existing supplier or enter a new supplier name.', 'danger')
             return render_template('yarn/edit_purchase.html', form=form, purchase=purchase, back_url=url_for('yarn.inventory'))
 
+        if has_outgoing and form.qty_kg.data != purchase.qty_kg:
+            flash('Quantity cannot be changed after yarn has been allocated to production.', 'danger')
+            return render_template('yarn/edit_purchase.html', form=form, purchase=purchase, back_url=url_for('yarn.inventory'))
+
         purchase.supplier_id = supplier_id
         purchase.yarn_type = form.yarn_type.data.strip()
         purchase.color = form.color.data.strip()
         purchase.qty_kg = form.qty_kg.data
         purchase.price_per_kg = form.price_per_kg.data
         purchase.status = form.status.data or purchase.status
+
+        if initial_inventory is not None and not has_outgoing:
+            initial_inventory.qty_kg = purchase.qty_kg
+            initial_inventory.unit_cost = purchase.price_per_kg
+
+        log_audit(
+            'update',
+            'YarnPurchase',
+            purchase.id,
+            user=current_user,
+            before_data=original_data,
+            after_data={
+                'supplier_id': purchase.supplier_id,
+                'yarn_type': purchase.yarn_type,
+                'color': purchase.color,
+                'qty_kg': float(purchase.qty_kg),
+                'price_per_kg': float(purchase.price_per_kg),
+                'status': purchase.status,
+            },
+            note='Yarn purchase updated',
+        )
 
         db.session.commit()
         flash('Yarn purchase updated successfully!', 'success')

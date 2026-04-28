@@ -37,7 +37,12 @@
             <table class="w-full text-sm text-left text-gray-700">
                 <thead class="text-xs uppercase bg-gray-50 text-gray-600">
                     <tr>
-                        <th class="px-4 py-3"><input id="select-all" type="checkbox"></th>
+                        <th class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500">
+                                <span>Select All</span>
+                            </div>
+                        </th>
                         <th class="px-4 py-3">Code</th>
                         <th class="px-4 py-3">Name</th>
                         <th class="px-4 py-3">Designation</th>
@@ -50,10 +55,10 @@
                 </thead>
                 <tbody>
                     {% for row in payroll_rows %}
-                    {% set disabled = (row.due <= 0) or (not row.employee.is_active) %}
-                    <tr class="border-b hover:bg-gray-50">
+                    {% set disabled = (not row.employee.is_active) or (row.due <= 0) %}
+                    <tr class="border-b hover:bg-gray-50 cursor-pointer payroll-row" data-employee-id="{{ row.employee.id }}">
                         <td class="px-4 py-3">
-                            <input class="row-check" type="checkbox" name="selected_employee_ids" value="{{ row.employee.id }}" {% if disabled %}disabled{% endif %}>
+                            <input class="row-check h-4 w-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500" type="checkbox" name="selected_employee_ids" value="{{ row.employee.id }}" {% if disabled %}disabled{% endif %}>
                         </td>
                         <td class="px-4 py-3 font-semibold">{{ row.employee.employee_code }}</td>
                         <td class="px-4 py-3">{{ row.employee.full_name }}</td>
@@ -74,7 +79,10 @@
         </div>
 
         <div class="flex items-center justify-between">
-            <p class="text-sm text-gray-600">Select multiple employees/workers and click pay once.</p>
+            <p class="text-sm text-gray-600">
+                Select multiple employees/workers and click pay once.
+                <span id="selected-count" class="ml-2 font-semibold text-blue-700">0 selected</span>
+            </p>
             <button type="submit" class="text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg text-sm px-5 py-2.5">Pay Selected</button>
         </div>
     </form>
@@ -111,14 +119,78 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const selectAll = document.getElementById('select-all');
-    const checks = Array.from(document.querySelectorAll('.row-check'));
+    const getChecks = () => Array.from(document.querySelectorAll('.row-check'));
+    const getRows = () => Array.from(document.querySelectorAll('.payroll-row'));
+    const checks = getChecks();
+    const rows = getRows();
+    const selectedCount = document.getElementById('selected-count');
     if (!selectAll) return;
 
-    selectAll.addEventListener('change', function () {
+    const syncSelectAllState = () => {
+        const enabledChecks = checks.filter((cb) => !cb.disabled);
+        const checkedCount = enabledChecks.filter((cb) => cb.checked).length;
+        selectAll.checked = enabledChecks.length > 0 && checkedCount === enabledChecks.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < enabledChecks.length;
+        // Update selected count text
+        if (selectedCount) {
+            selectedCount.textContent = `${checkedCount} selected`;
+        }
+
+        // Ensure each row reflects its checkbox state (visual highlight)
         checks.forEach((cb) => {
+            const row = cb.closest('.payroll-row');
+            if (!row) return;
+            if (cb.checked) {
+                row.classList.add('bg-cyan-900/8', 'border-l-4', 'border-cyan-400');
+            } else {
+                row.classList.remove('bg-cyan-900/8', 'border-l-4', 'border-cyan-400');
+            }
+        });
+    };
+
+    // Use event delegation so dynamic changes or overlays don't break behavior
+    const tableBody = document.querySelector('table tbody');
+
+    selectAll.addEventListener('change', function () {
+        const allChecks = getChecks();
+        allChecks.forEach((cb) => {
             if (!cb.disabled) cb.checked = selectAll.checked;
         });
+        syncSelectAllState();
     });
+
+    // Delegate change events for checkboxes
+    if (tableBody) {
+        tableBody.addEventListener('change', function (event) {
+            const cb = event.target.closest('.row-check');
+            if (cb) {
+                const row = cb.closest('.payroll-row');
+                if (row) {
+                    if (cb.checked) {
+                        row.classList.add('bg-cyan-900/8', 'border-l-4', 'border-cyan-400');
+                    } else {
+                        row.classList.remove('bg-cyan-900/8', 'border-l-4', 'border-cyan-400');
+                    }
+                }
+                syncSelectAllState();
+            }
+        });
+
+        // Delegate click on rows to toggle checkbox (but ignore clicks on interactive elements)
+        tableBody.addEventListener('click', function (event) {
+            const row = event.target.closest('.payroll-row');
+            if (!row) return;
+            if (event.target.closest('input, button, a, label')) return;
+            const checkbox = row.querySelector('.row-check');
+            if (checkbox && !checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+                // Manually dispatch change so delegation handles it
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+    }
+
+    syncSelectAllState();
 });
 </script>
 {% endblock %}

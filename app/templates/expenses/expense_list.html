@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Expense Tracking - AMITY Apparel{% endblock %}
+
+{% block content %}
+<div class="px-4 space-y-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <h2 class="text-3xl font-bold text-gray-800">Expense Tracking</h2>
+        <form method="GET" action="{{ url_for('expenses.expense_list') }}" class="flex items-center gap-2">
+            <input type="month" name="month" value="{{ month_start.strftime('%Y-%m') }}" class="rounded-lg border border-gray-300 p-2 text-sm">
+            <button type="submit" class="text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm px-4 py-2">View Month</button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-lg border p-4 shadow-sm">
+            <p class="text-xs uppercase text-gray-500">Total Expense (Month)</p>
+            <p class="text-2xl font-bold mt-1 text-rose-700">{{ '{:,.2f}'.format(total_expense) }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white border rounded-lg shadow-sm p-4">
+        <h3 class="text-lg font-semibold mb-3">Add New Expense</h3>
+        <form method="POST" action="{{ url_for('expenses.expense_new') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{ form.hidden_tag() }}
+            <div>
+                <label class="block mb-1 text-sm font-medium text-gray-700">{{ form.expense_date.label.text }}</label>
+                {{ form.expense_date(class_='w-full rounded-lg border border-gray-300 p-2') }}
+            </div>
+            <div>
+                <label class="block mb-1 text-sm font-medium text-gray-700">{{ form.category.label.text }}</label>
+                {{ form.category(class_='w-full rounded-lg border border-gray-300 p-2') }}
+            </div>
+            <div>
+                <label class="block mb-1 text-sm font-medium text-gray-700">{{ form.amount.label.text }}</label>
+                {{ form.amount(class_='w-full rounded-lg border border-gray-300 p-2', step='0.01', min='0') }}
+            </div>
+            <div>
+                <label class="block mb-1 text-sm font-medium text-gray-700">{{ form.description.label.text }}</label>
+                {{ form.description(class_='w-full rounded-lg border border-gray-300 p-2') }}
+            </div>
+            <div class="md:col-span-2">
+                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5">Add Expense</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white border rounded-lg shadow-sm overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-700">
+            <thead class="text-xs uppercase bg-gray-50 text-gray-600">
+                <tr>
+                    <th class="px-4 py-3">Date</th>
+                    <th class="px-4 py-3">Category</th>
+                    <th class="px-4 py-3">Amount</th>
+                    <th class="px-4 py-3">Description</th>
+                    <th class="px-4 py-3">Recorded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in expenses %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3">{{ item.expense_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-4 py-3">{{ item.category }}</td>
+                    <td class="px-4 py-3 text-rose-700 font-semibold">{{ '{:,.2f}'.format(item.amount) }}</td>
+                    <td class="px-4 py-3">{{ item.description or '-' }}</td>
+                    <td class="px-4 py-3">{{ item.created_by.username if item.created_by else '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No expenses in this month yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

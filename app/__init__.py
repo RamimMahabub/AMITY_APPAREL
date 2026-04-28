@@ -17,6 +17,16 @@ csrf = CSRFProtect()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    database_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if isinstance(database_uri, str) and database_uri.startswith('mysql'):
+        app.config.setdefault(
+            'SQLALCHEMY_ENGINE_OPTIONS',
+            {
+                'pool_pre_ping': True,
+                'pool_recycle': 280,
+                'connect_args': {'connect_timeout': 5},
+            },
+        )
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -40,6 +50,9 @@ def create_app(config_class=Config):
 
     from app.payroll.routes import payroll as payroll_bp
     app.register_blueprint(payroll_bp, url_prefix='/payroll')
+
+    from app.expenses.routes import expenses as expenses_bp
+    app.register_blueprint(expenses_bp, url_prefix='/expenses')
 
     @app.route('/')
     def index():

@@ -16,8 +16,10 @@
                     <th class="px-6 py-3">Order #</th>
                     <th class="px-6 py-3">Container No</th>
                     <th class="px-6 py-3">Final Qty Shipped (pcs)</th>
+                    <th class="px-6 py-3">Order Progress</th>
                     <th class="px-6 py-3">Shipping Date</th>
                     <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,6 +31,7 @@
                     </td>
                     <td class="px-6 py-4">{{ s.container_no }}</td>
                     <td class="px-6 py-4 font-bold text-green-600">{{ s.final_qty }}</td>
+                    <td class="px-6 py-4 font-semibold text-cyan-500">{{ "{:.2f}".format(progress_data.get(s.id, 0)) }}%</td>
                     <td class="px-6 py-4">
                         {% if s.shipping_date %}
                             {{ s.shipping_date.strftime('%Y-%m-%d') }}
@@ -39,10 +42,13 @@
                     <td class="px-6 py-4">
                         <span class="bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">{{ s.status }}</span>
                     </td>
+                    <td class="px-6 py-4">
+                        <a href="{{ url_for('orders.shipment_edit', shipment_id=s.id) }}" class="text-blue-600 hover:underline font-semibold">Edit</a>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center">No shipments recorded.</td>
+                    <td colspan="8" class="px-6 py-4 text-center">No shipments recorded.</td>
                 </tr>
                 {% endfor %}
             </tbody>
