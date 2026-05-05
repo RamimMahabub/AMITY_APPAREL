@@ -11,6 +11,7 @@ yarn = Blueprint('yarn', __name__)
 
 @yarn.route('/inventory', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def inventory():
     purchases = YarnPurchase.query.order_by(YarnPurchase.created_at.desc()).all()
     low_stock_alerts = get_low_stock_purchases()
@@ -183,6 +184,7 @@ def purchase():
 
 @yarn.route('/receipt/<int:purchase_id>', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def receipt(purchase_id):
     purchase = YarnPurchase.query.get_or_404(purchase_id)
     return render_template('yarn/receipt.html', purchase=purchase)

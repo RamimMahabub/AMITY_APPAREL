@@ -21,7 +21,7 @@ def permission_required(permission_name):
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated or not current_user.has_permission(permission_name):
                 flash('You do not have permission to access this resource.', 'danger')
-                return redirect(url_for('auth.dashboard'))
+                return redirect(url_for('orders.order_list'))
             return f(*args, **kwargs)
 
         return decorated_function
@@ -34,7 +34,7 @@ def role_required(roles):
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated or current_user.role not in roles:
                 flash('You do not have permission to access.', 'danger')
-                return redirect(url_for('auth.dashboard'))
+                return redirect(url_for('orders.order_list'))
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -87,6 +87,7 @@ def logout():
 
 @auth.route('/dashboard')
 @login_required
+@role_required(['Admin'])
 def dashboard():
     month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     urgent_deadline = datetime.utcnow() + timedelta(days=2)

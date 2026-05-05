@@ -23,6 +23,7 @@ def _sync_order_shipment_status(order: Order):
 
 @orders.route('/buyers', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def buyer_list():
     buyers = Buyer.query.all()
     return render_template('orders/buyer_list.html', buyers=buyers)
@@ -87,6 +88,7 @@ def order_new():
 
 @orders.route('/shipments', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def shipment_list():
     shipments = Shipment.query.order_by(Shipment.id.desc()).all()
     progress_data = {}

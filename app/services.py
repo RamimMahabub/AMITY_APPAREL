@@ -8,7 +8,7 @@ from typing import Any
 from sqlalchemy import func
 
 from app import db
-from app.models import AuditLog, Expense, InventoryLedger, Order, SalaryPayment, Shipment, YarnPurchase
+from app.models import AuditLog, Expense, InventoryLedger, Order, ProductionStage, SalaryPayment, Shipment, YarnPurchase
 
 
 ZERO = Decimal('0')
@@ -138,11 +138,19 @@ def calculate_waste_percentage(input_qty, waste_qty) -> Decimal:
 
 
 def calculate_shipment_progress(order: Order) -> Decimal:
-    shipped_qty = db.session.query(func.coalesce(func.sum(Shipment.final_qty), 0)).filter(Shipment.order_id == order.id).scalar() or 0
-    total_qty = to_decimal(order.total_qty)
-    if total_qty <= 0:
-        return ZERO
-    return min((to_decimal(shipped_qty) / total_qty * Decimal('100')).quantize(Decimal('0.01')), Decimal('100.00'))
+    stages = db.session.query(ProductionStage.stage_name).filter(
+        ProductionStage.order_id == order.id
+    ).all()
+    
+    max_progress = 0
+    stage_values = {'Cutting': 25, 'Sewing': 50, 'Finishing': 75, 'Packing': 100}
+    
+    for stage in stages:
+        val = stage_values.get(stage.stage_name, 0)
+        if val > max_progress:
+            max_progress = val
+            
+    return Decimal(max_progress).quantize(Decimal('0.01'))
 
 
 def calculate_order_financials(order: Order) -> dict[str, Decimal]:

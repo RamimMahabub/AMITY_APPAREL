@@ -10,6 +10,7 @@ production = Blueprint('production', __name__)
 
 @production.route('/knitting', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def knitting_list():
     jobs = KnittingJob.query.order_by(KnittingJob.id.desc()).all()
     return render_template('production/knitting_list.html', jobs=jobs)
@@ -50,7 +51,7 @@ def knitting_new():
 
 @production.route('/knitting/<int:job_id>/update', methods=['GET', 'POST'])
 @login_required
-@role_required(['Admin', 'Manager', 'Staff'])
+@role_required(['Admin', 'Manager'])
 def knitting_update(job_id):
     job = KnittingJob.query.get_or_404(job_id)
     form = UpdateKnittingJobForm(obj=job)
@@ -71,6 +72,7 @@ def knitting_update(job_id):
 
 @production.route('/dyeing', methods=['GET'])
 @login_required
+@role_required(['Admin', 'Manager'])
 def dyeing_list():
     jobs = DyeingJob.query.order_by(DyeingJob.id.desc()).all()
     return render_template('production/dyeing_list.html', jobs=jobs)
@@ -105,7 +107,7 @@ def dyeing_new():
 
 @production.route('/dyeing/<int:job_id>/update', methods=['GET', 'POST'])
 @login_required
-@role_required(['Admin', 'Manager', 'Staff'])
+@role_required(['Admin', 'Manager'])
 def dyeing_update(job_id):
     job = DyeingJob.query.get_or_404(job_id)
     form = UpdateDyeingJobForm(obj=job)
